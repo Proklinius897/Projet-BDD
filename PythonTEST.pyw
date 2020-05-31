@@ -71,11 +71,13 @@ def printable(name):
     
   return myresult
 
+def deco(root):
+  root.destroy()
 
 
-
-def premiere ():
-  
+def premiere (root2):
+  if root2!=None:
+    deco(root2)
   root = Tk()
   center(root)
   root.title("Connexion page")
@@ -91,13 +93,12 @@ def premiere ():
   lab3.grid(column=0, row=2)
   entrypass.grid(column=1, row=2)
   button = Button(root,text='Connexion',command = lambda : connection(entryname,entrypass,root))
-  button2= Button(root,text='Inscription',command = lambda : inscription(root))
+  
   button.grid(column=0,row=5)
-  button2.grid(column=0,row=6)
+  
   return root
 
-def deco (root):
-  root.destroy()
+
 
 def deuxieme(root3):
   
@@ -110,13 +111,15 @@ def deuxieme(root3):
   button1 =Button(root2, text="Organiser un rdv",command = lambda : inputrdv(root2))
   calendrier = Button(root2,text="Consulter les rendez-vous")
   button2 =Button(root2, text="Informations Clients", command = lambda: infoclients(root2))
-  button3=Button(root2, text="Déconnexion", command = lambda : deco(root2))
+  inscrip= Button(root2,text='Inscription de clients ',command = lambda : inscription(root2))
+  button3=Button(root2, text="Déconnexion", command = lambda : premiere(root2))
   lab1.grid(column=0, row=0)
   lab2.grid(column=0,row=1)
   button1.grid(column=0,row=2)
   calendrier.grid(column=0,row=3)
   button2.grid(column=0,row=4)
-  button3.grid(column=0,row=5)
+  inscrip.grid(column=0,row=5)
+  button3.grid(column=0,row=6)
   return root2
 
 class option():  ###Cette classe nous permet de créer les option pour L'option menu et ainsi de pouvoir input les rdv
@@ -206,23 +209,80 @@ def sortdv (): ###On va ranger dans un tableau l'ordre des consultation
 def inscription(root):
   deco(root)
   root=Tk()
+  center(root)
+  root.title("Inscription")
   nomlabel=Label(root,text="Nom")
   nom=Entry(root,text="Nom")
+  nomlabel.pack(side='top')
+  nom.pack(side='top')
+  
   prenomlabel=Label(root,text="Prenom")
   prenom=Entry(root,text="Prenom")
+  prenomlabel.pack(side='top')
+  prenom.pack(side='top')
+  agelabel=Label(root,text="Age")
+  age=Entry(root,text="Age")
+  agelabel.pack(side='top')
+  age.pack(side='top')
+  
   emaillabel=Label(root,text="Email")
   email=Entry(root,text="Email")
+  emaillabel.pack(side='top')
+  email.pack(side='top')
+  couplelabel=Label(root,text="Êtes vous en couple avec l'un de nos clients?")
+  couple=Entry(root,text="Couple")
+  couplelabel.pack(side='top')
+  couple.pack(side='top')
   passwordlabel=Label(root,text="Veuilliez choisir un mot de passe")
-  password=Entry(root,text="Mot de passe")
-  vals = ['A', 'B', 'C']
-  etiqs = ['trop chaud', 'trop froid', 'correct']
+  password=Entry(root,show="*")
+  passwordlabel.pack(side='top')
+  password.pack(side='top')  
+  password2label=Label(root,text="Veuilliez vérifier le mot de passe")
+  password2=Entry(root,show="*")
+  password2label.pack(side='top')
+  password2.pack(side='top')
+  connulabel=Label(root,text="Comment avez-vous connu ce cabinet?")
+  connu=Entry(root,text="Moyen")  
+  connulabel.pack(side='top')
+  connu.pack(side='top')
+  vals = ['1', '2','3']
+  etiqs = ['Homme', 'Femme','Autre']
   varGr = StringVar()
   varGr.set(vals[1])
   for i in range(3):
       b = Radiobutton(root, variable=varGr, text=etiqs[i], value=vals[i])
       b.pack(side='left', expand=1)
-  Checkhomme=Radiobutton(root,text="Homme")
-  Checkfemme=Radiobutton(root,text="Femme")
+
+  valider=Button(root,text="Valider",command= lambda : inscrire(nom.get(),prenom.get(),email.get(),password.get(),password2.get(),couple.get(),age.get(),varGr.get(),connu.get()))
+  valider.pack(side="bottom")
+  
+  
+def getsexe(var):
+  
+  print(var.get())
+
+
+def inscrire(nom,prenom,email,password,passwordmatch,couple,age,hf,connu):
+  print(connu)
+  if couple=="":
+    couple="NULL"
+  if password == passwordmatch:
+    mycursor=mydb.cursor()
+    sql = "INSERT INTO psychologue.user (id_user, nom, prenom, email, password, couple, age, sexe,connu) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+
+    val = ("NULL",nom , prenom , email ,password,None,age,hf,connu)
+    mycursor.execute(sql,val)
+    mydb.commit()
+  if password != passwordmatch:
+    root=Tk()
+    center(root)
+    root.title("Le mot de passe ne correspond pas")
+    Label=label(root,text="Attention le mot de passe ne correspond pas")
+    Recommencer = Button(root,text="Ok",command=lambda : root.destroy())
+
+  
+
+
   
 
 
@@ -478,7 +538,7 @@ def menu():
     """
 
 if __name__ == "__main__":
-  root = premiere()
+  root = premiere(None)
   
   root.mainloop()
    
