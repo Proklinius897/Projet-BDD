@@ -75,6 +75,7 @@ def printable(name):
 
 
 def premiere ():
+  
   root = Tk()
   center(root)
   root.title("Connexion page")
@@ -89,8 +90,10 @@ def premiere ():
   entryname.grid(column=1, row=1)
   lab3.grid(column=0, row=2)
   entrypass.grid(column=1, row=2)
-  button = Button(root,text='Submit',command = lambda : connection(entryname,entrypass,root))
+  button = Button(root,text='Connexion',command = lambda : connection(entryname,entrypass,root))
+  button2= Button(root,text='Inscription',command = lambda : inscription(root))
   button.grid(column=0,row=5)
+  button2.grid(column=0,row=6)
   return root
 
 def deco (root):
@@ -116,7 +119,7 @@ def deuxieme(root3):
   button3.grid(column=0,row=5)
   return root2
 
-class option(): 
+class option():  ###Cette classe nous permet de créer les option pour L'option menu et ainsi de pouvoir input les rdv
   OPTIONannée=[None]*4
   OPTIONmois=[None]*12
   OPTIONjour=[None]*32
@@ -149,7 +152,7 @@ class option():
     OPTIONheure[l]=l1
     l+=1
     l1+=0.5
-  def toStringheure(self, OPTIONheure):
+  def toStringheure(self, OPTIONheure): #CELA CONVERTIT POUR L'UTILISATEUR LES HEURE EN FORMAT DOUBLE ----> EN FORMAT LISIBLE
     OPTIONheurestring=[None]*24
     p=0
     print(OPTIONheure)
@@ -171,9 +174,9 @@ class option():
   
 
   
-def selectname(name,name2,group,table):
+def selectname(id,name,name2,group,table):
   mycursor = mydb.cursor()
-  mycursor.execute("SELECT "+name+", "+name2 + " FROM " + table +" GROUP BY "+ group )
+  mycursor.execute("SELECT "+id+", "+name+", "+name2 + " FROM " + table +" GROUP BY "+ group )
   myresult = mycursor.fetchall()
   lenght=len(myresult)
   
@@ -181,24 +184,62 @@ def selectname(name,name2,group,table):
     print(x)
     
     
+    
   return myresult
 
-      
+def sortdv (): ###On va ranger dans un tableau l'ordre des consultation
+  mycursor = mydb.cursor()
+  mycursor.execute("SELECT id_consult FROM consultation ")
+  myresult = mycursor.fetchall()
+  dernier=myresult[-1][0]
+  
+  # mysecond=[None]*(len(myresult)-1)
+  # p=0
+
+  # while p <len(myresult):
+  #   mysecond[p]=int(myresult[p][0])
+  #   p+1
+    
+  return dernier
+
+
+def inscription(root):
+  deco(root)
+  root=Tk()
+  nomlabel=Label(root,text="Nom")
+  nom=Entry(root,text="Nom")
+  prenomlabel=Label(root,text="Prenom")
+  prenom=Entry(root,text="Prenom")
+  emaillabel=Label(root,text="Email")
+  email=Entry(root,text="Email")
+  passwordlabel=Label(root,text="Veuilliez choisir un mot de passe")
+  password=Entry(root,text="Mot de passe")
+  vals = ['A', 'B', 'C']
+  etiqs = ['trop chaud', 'trop froid', 'correct']
+  varGr = StringVar()
+  varGr.set(vals[1])
+  for i in range(3):
+      b = Radiobutton(root, variable=varGr, text=etiqs[i], value=vals[i])
+      b.pack(side='left', expand=1)
+  Checkhomme=Radiobutton(root,text="Homme")
+  Checkfemme=Radiobutton(root,text="Femme")
+  
+
+
+  
 
 
 
 def inputrdv(root):
   
   OPTION = option()
-  
-  
   x=int(OPTION.currentyear)-1
   y=int(OPTION.currentmonth)-1
   z=int(OPTION.currentday)-1
-  
+
 
   HstringOption=OPTION.toStringheure(OPTION.OPTIONheure)
-  CLIENTS = selectname("nom","prenom","id_user","user")
+  CLIENTS = selectname("id_user","nom","prenom","id_user","user")
   CLIENTS.append(None)
   deco(root)
   root4=Tk()
@@ -262,7 +303,8 @@ def inputrdv(root):
  
 
   
-def checkvalid(client,année,jour,mois,heure):
+def checkvalid(clientid,année,jour,mois,heure):
+  client=clientid[1]
   heure = heure.split("h")
   heureadd = heure
   if heure[1] != '':
@@ -283,14 +325,13 @@ def checkvalid(client,année,jour,mois,heure):
   
   currentminutes=int(today.strftime("%M"))/60
   
-  print(heure)
-  print(today.strftime("%H"))
+
   x=1
   if année==currentyear:
     if mois<currentmonth:
       print("Mois pas bon")
       x=0
-    if jour<currentday and mois<currentmonth:
+    if jour<currentday and mois<=currentmonth:
       print("le jour n'est pas valide")
       x=0
  
@@ -302,6 +343,14 @@ def checkvalid(client,année,jour,mois,heure):
     val = ("NULL", str(année)+"-"+str(mois)+"-"+str(jour) , heure , heureadd ,100,""," "," ")
     mycursor.execute(sql,val)
     mydb.commit()
+    id_consult=sortdv()
+ 
+    
+    sql2="INSERT INTO consult_patient (id_user, id_consult) VALUES (%s,%s)"
+    val2 = (str(client),str(id_consult))
+    mycursor.execute(sql2,val2)
+    mydb.commit()
+
     ##mycursor.execute("INSERT INTO `psychologue`.`consultation` (`id_consult`, `date`, `heuredebut`, `heurefin`, `prix`, `mode`, `anxiete`, `commentaires`) VALUES (NULL," +str(année)+"-"+str(mois)+"-"+str(jour)+" , " + str(heure)+ " , " +str(heureadd)+ " , " +"''"+","+"''" +","+ "' '" +","+"' ' );")
     print("Insert is successful")          
     
@@ -429,8 +478,11 @@ def menu():
     """
 
 if __name__ == "__main__":
+  root = premiere()
+  
+  root.mainloop()
    
-   menu()
+  ## menu()
 
 
 

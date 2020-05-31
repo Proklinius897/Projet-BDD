@@ -1,6 +1,6 @@
 import mysql.connector
 from tkinter import *
-
+from datetime import *
 
 """
 mydb = mysql.connector.connect(
@@ -103,15 +103,153 @@ def deuxieme(root3):
   root2.title("Menu")
   lab1 = Label(root2, text="----------------connexion établie-----------------")
   lab2 =Label(root2, text="Que voulez-vous faire ?")
-  button1 =Button(root2, text="Organiser un rdv")
+  button1 =Button(root2, text="Organiser un rdv",command = lambda : inputrdv(root2))
+  calendrier = Button(root2,text="Consulter les rendez-vous")
   button2 =Button(root2, text="Informations Clients", command = lambda: infoclients(root2))
   button3=Button(root2, text="Déconnexion", command = lambda : deco(root2))
   lab1.grid(column=0, row=0)
   lab2.grid(column=0,row=1)
   button1.grid(column=0,row=2)
-  button2.grid(column=0,row=3)
-  button3.grid(column=0,row=4)
+  calendrier.grid(column=0,row=3)
+  button2.grid(column=0,row=4)
+  button3.grid(column=0,row=5)
   return root2
+
+class option(): 
+  OPTIONannée=[None]*4
+  OPTIONmois=[None]*12
+  OPTIONjour=[None]*32
+  OPTIONheure=[None]*24
+
+  
+  
+  i=0
+  j=0
+  k=0
+  l=0
+  l1=8.0
+  today=date.today()
+  currentyear = int(today.strftime("%Y"))
+  currentmonth=int(today.strftime("%m"))
+  currentday=int(today.strftime("%d"))
+  while i <3 : 
+    OPTIONannée[i]=currentyear+1
+    currentyear=currentyear+1
+    i+=1
+  while j <12 :
+    OPTIONmois[j]=j+1
+  
+    j+=1
+  while k<31:
+    OPTIONjour[k]=k+1
+    k+=1
+  while l1<20:
+    
+    OPTIONheure[l]=l1
+    l+=1
+    l1+=0.5
+  def toStringheure(self, OPTIONheure):
+    OPTIONheurestring=[None]*24
+    p=0
+    print(OPTIONheure)
+    print(OPTIONheure[0])
+    
+    while p<24:
+      print (OPTIONheure[p]-float(int(OPTIONheure[p])))
+      if OPTIONheure[p]-float(int(OPTIONheure[p]))==0.5:
+        OPTIONheurestring[p]=str(int(OPTIONheure[p]))+"h30"
+        p+=1
+      else :
+        OPTIONheurestring[p]=str(int(OPTIONheure[p]))+"h"
+        p+=1
+    return OPTIONheurestring
+  
+    
+  
+
+  
+
+  
+def selectname(name,name2,group,table):
+  mycursor = mydb.cursor()
+  mycursor.execute("SELECT "+name+", "+name2 + " FROM " + table +" GROUP BY "+ group )
+  myresult = mycursor.fetchall()
+  lenght=len(myresult)
+  
+  for x in myresult:
+    print(x)
+    
+    
+  return myresult
+
+      
+
+
+
+def inputrdv(root):
+  
+  OPTION = option()
+  
+  
+  x=int(OPTION.currentyear)-1
+  y=int(OPTION.currentmonth)-1
+  z=int(OPTION.currentday)-1
+  
+
+  HstringOption=OPTION.toStringheure(OPTION.OPTIONheure)
+  CLIENTS = selectname("nom","prenom","id_user","user")
+  deco(root)
+  root4=Tk()
+  center(root4)
+  root4.geometry("300x250")
+  labelNA=Label(root4,text="VEUILLIEZ ENTREZ LES INFORMATION DU CLIENT")
+  
+  ###LABELS
+  labelClient=Label(root4,text="Clients")
+  labelDaterdv=Label(root4,text="Date")
+  varclients=StringVar(root4)
+  varclients.set(CLIENTS[0])
+  varclients2=StringVar(root4)
+  varclients2.set(CLIENTS[0])
+  varclients3=StringVar(root4)
+  varclients3.set(CLIENTS[0])
+  variableyear=IntVar(root4)
+  variableyear.set(OPTION.OPTIONannée[0])
+
+  variablemonth =IntVar(root4)
+  variablemonth.set(OPTION.OPTIONmois[y])
+
+  variableday = IntVar(root4)
+  variableday.set(OPTION.OPTIONjour[z])
+
+  variablehour=DoubleVar(root4)
+  variablehour.set(HstringOption[0])
+
+
+  Optionpersonne = OptionMenu(root4,varclients,*CLIENTS)
+  Optionpersonne2 = OptionMenu(root4,varclients2,*CLIENTS)
+  Optionpersonne3 = OptionMenu(root4,varclients3,*CLIENTS)
+  
+  Optionyear = OptionMenu(root4,variableyear,*OPTION.OPTIONannée)
+  Optionmois = OptionMenu(root4,variablemonth,*OPTION.OPTIONmois)
+  Optionjour = OptionMenu(root4,variableday,*OPTION.OPTIONjour)
+  OptionHeure = OptionMenu(root4,variablehour,*HstringOption)
+
+  labelNA.pack(side=TOP)
+  labelClient.pack(side=TOP)
+  Optionpersonne.pack(padx=5,pady=5)
+  Optionpersonne.config(width=20)
+  Optionpersonne2.pack(padx=5,pady=7)
+  Optionpersonne2.config(width=20)
+  Optionpersonne3.pack(padx=5,pady=6)
+  Optionpersonne3.config(width=20)
+
+  labelDaterdv.pack(padx=5,pady=6)
+  Optionyear.pack(padx=0,pady=7 ,side=LEFT)
+  Optionmois.pack(padx=0, pady=7 ,side=LEFT)
+  Optionjour.pack(padx=0,pady=7,side=LEFT)
+  OptionHeure.pack(padx=0,pady=7,side=LEFT)
+  
 
 def infoclients(root2):
 
@@ -130,7 +268,7 @@ def infoclients(root2):
   textPrenom=Text(root3,width=20)
   textNom=Text(root3,width=20)
   textMail=Text(root3,width=20)
-  liste=printable("patient")
+  liste=printable("user")
 
   Retour=Button(root3,text="Retour",command= lambda: deuxieme(root3))
 
@@ -138,9 +276,9 @@ def infoclients(root2):
   for x in liste:
     
     textId.insert(END,str(x[0])+'\n')
-    textPrenom.insert(END,str(x[2])+'\n')
-    textNom.insert(END,str(x[3])+'\n')
-    textMail.insert(END,str(x[4])+'\n')
+    textPrenom.insert(END,str(x[1])+'\n')
+    textNom.insert(END,str(x[2])+'\n')
+    textMail.insert(END,str(x[3])+'\n')
   
   lab1 = Label(root3, text="----------------Vos clients-----------------")
   ##lab2 = Label(root3, text=table)
