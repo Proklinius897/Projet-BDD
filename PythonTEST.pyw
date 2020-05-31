@@ -252,10 +252,13 @@ def inscription(root):
   for i in range(3):
       b = Radiobutton(root, variable=varGr, text=etiqs[i], value=vals[i])
       b.pack(side='left', expand=1)
-
+  retour=Button(root,text="Retour",command=lambda : deuxieme(root))
+  retour.pack(side="bottom")
+  
   valider=Button(root,text="Valider",command= lambda : inscrire(nom.get(),prenom.get(),email.get(),password.get(),password2.get(),couple.get(),age.get(),varGr.get(),connu.get()))
   valider.pack(side="bottom")
-  
+  ###Pour l'instant vous ne pouvez pas rajouter de couple, il nous faut aller chercher les valeurs des utilisateurs existants, pour permettre au psy de rentrer le couple
+
   
 def getsexe(var):
   
@@ -263,7 +266,7 @@ def getsexe(var):
 
 
 def inscrire(nom,prenom,email,password,passwordmatch,couple,age,hf,connu):
-  print(connu)
+  ###A finir, pour l'instant on ne peut rajouter de couple
   if couple=="":
     couple="NULL"
   if password == passwordmatch:
@@ -355,8 +358,12 @@ def inputrdv(root):
   Optionjour.pack(padx=0,pady=7,side=LEFT)
   OptionHeure.pack(padx=0,pady=7,side=LEFT)
 
+  retour=Button(root4,text="Retour",command=lambda : deuxieme(root4))
+  retour.pack(side="bottom")
+
   Valider= Button(root4,text="Valider/Vérifier", command= lambda : checkvalid(varclients.get(),variableyear.get(),variableday.get(),variablemonth.get(),variablehour.get()))
   Valider.pack(padx=5,pady=9,side=BOTTOM)
+
   return root4
 
 
