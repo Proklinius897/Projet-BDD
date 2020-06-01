@@ -36,13 +36,16 @@ def pri():
 def connection(compte,mdp,thisroot):
   tab1 = getvalue(compte,mdp)
   global mydb
-  mydb = mysql.connector.connect(
-    host="localhost",
-    user=tab1[0],
-    passwd=tab1[1],
-    auth_plugin='mysql_native_password',
-    database="psychologue"
-  )
+  try:
+    mydb = mysql.connector.connect(
+      host="localhost",
+      user=tab1[0],
+      passwd=tab1[1],
+      auth_plugin='mysql_native_password',
+      database="psychologue"
+    )
+  except:
+    error("Mauvais mot de passe")
   if mydb!=None:
     deuxieme(thisroot)
     
@@ -98,6 +101,8 @@ def premiere (root2):
   button.grid(column=0,row=5)
   
   return root
+
+##def consulterrdv():
 
 
 
@@ -429,21 +434,35 @@ def checkvalid(clientid,clientid2,clientid3,année,jour,mois,heure):
     if clientid2 !="None":
       sql3="INSERT INTO consult_patient (id_user, id_consult) VALUES (%s,%s)"
       val3 = (str(client2),str(id_consult))
-      mycursor.execute(sql3,val3)
-      mydb.commit()
+      try:
+        mycursor.execute(sql3,val3)
+        mydb.commit()
+      except:
+        error("Vous avez rentré le client "+client2+" plusieurs fois")
+      
     if clientid3 !="None":
       sql4="INSERT INTO consult_patient (id_user, id_consult) VALUES (%s,%s)"
       val4 = (str(client3),str(id_consult))
-      mycursor.execute(sql4,val4)
-      mydb.commit()
+      try:
+        mycursor.execute(sql4,val4)
+        mydb.commit()
+      except:
+        error("Vous avez rentré le client "+client3+" plusieurs fois") 
+      
 
       
 
     ##mycursor.execute("INSERT INTO `psychologue`.`consultation` (`id_consult`, `date`, `heuredebut`, `heurefin`, `prix`, `mode`, `anxiete`, `commentaires`) VALUES (NULL," +str(année)+"-"+str(mois)+"-"+str(jour)+" , " + str(heure)+ " , " +str(heureadd)+ " , " +"''"+","+"''" +","+ "' '" +","+"' ' );")
     print("Insert is successful")          
     
-
-  
+def error(string):
+  error=Tk()
+  center(error)
+  error.title("Erreur")
+  errorlabel=Label(error,text=string)
+  errorbutton=Button(error,text="Ok",command= lambda : error.destroy())
+  errorlabel.pack()
+  errorbutton.pack()
 
 def infoclients(root2):
 
