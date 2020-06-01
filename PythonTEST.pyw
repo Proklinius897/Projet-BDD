@@ -2,6 +2,8 @@ import mysql.connector
 from tkinter import *
 from datetime import *
 import re
+import calendar
+import numpy as np
 
 """
 mydb = mysql.connector.connect(
@@ -44,12 +46,35 @@ def connection(compte,mdp,thisroot):
       auth_plugin='mysql_native_password',
       database="psychologue"
     )
+    if mydb!=None:
+     deuxieme(thisroot)
   except:
     error("Mauvais mot de passe")
-  if mydb!=None:
-    deuxieme(thisroot)
+
     
+def connectionuser(email,password,root):
+  ###on se connecte directement a la base de donnée mais on accede a la seconde page que si l'email et l'utilisateur sont correspondant 
+  global mydb
   
+  try:
+    mydb = mysql.connector.connect(
+      host="localhost",
+      user="user",
+      passwd="",
+      auth_plugin='mysql_native_password',
+      database="psychologue"
+    )
+  except:
+    error("Mauvais mot de passe")
+  tableau=gettable("user")
+  for i in range(len(tableau)):
+    print(tableau[i][3])
+    print(email)
+    if tableau[i][3]==email and tableau[i][4]==password:
+      deuxieme(root)
+      print(tableau[i][3]+"="+email)
+
+
   
 
 
@@ -75,8 +100,42 @@ def printable(name):
     
   return myresult
 
+def gettable(name):
+  mycursor = mydb.cursor()
+  mycursor.execute("SELECT * FROM "+name)
+  myresult = mycursor.fetchall()
+  lenght=len(myresult)
+
+  return myresult
+
+
 def deco(root):
   root.destroy()
+
+def premiereclient(root2):
+  if root2!=None:
+    deco(root2)
+  root = Tk()
+  center(root)
+  root.title("Connexion page")
+  lab1 = Label(root,text="Bienvenue, veuilliez vous connecter")
+  lab2 = Label(root,text="Identifiant : ")
+  lab3=Label(root,text="Mot de passe")
+  entryname= Entry(root)
+  entrypass= Entry(root,show='*')
+
+  lab1.grid(column=0, row=0)
+  lab2.grid(column=0, row=1)
+  entryname.grid(column=1, row=1)
+  lab3.grid(column=0, row=2)
+  entrypass.grid(column=1, row=2)
+  button = Button(root,text='Connexion',command = lambda : connectionuser(entryname.get(),entrypass.get(),root))
+  client=Button(root,text="psy",command=lambda:premiere(root))
+
+  
+  button.grid(column=0,row=5)
+  client.grid(column=0,row=6)
+
 
 
 def premiere (root2):
@@ -97,12 +156,132 @@ def premiere (root2):
   lab3.grid(column=0, row=2)
   entrypass.grid(column=1, row=2)
   button = Button(root,text='Connexion',command = lambda : connection(entryname,entrypass,root))
+  client=Button(root,text="Client",command = lambda : premiereclient(root))
+
   
   button.grid(column=0,row=5)
-  
+  client.grid(column=0,row=6)
   return root
 
-##def consulterrdv():
+
+class TkinterCalendar(calendar.Calendar):
+
+    def formatmonth(self, master, year, month):
+
+        dates = self.monthdatescalendar(year, month)
+
+        frame = Frame(master)
+
+        self.labels = []
+
+        for r, week in enumerate(dates):
+            labels_row = []
+            for c, date in enumerate(week):
+                label = Button(frame, text=date.strftime('%Y\n%m\n%d'))
+                label.grid(row=r, column=c)
+
+                if date.month != month:
+                    label['bg'] = '#aaa'
+
+                if c == 6:
+                    label['fg'] = 'red'
+
+                labels_row.append(label)
+            self.labels.append(labels_row)
+
+        return frame
+
+
+
+def consulterrdv(root2):
+  root2.destroy()
+  i=0
+  j=1
+  k=2
+  root = Tk()
+  center(root)
+  
+  rdvpre=gettable("vue_psy")
+  dates=[None]*len(rdvpre)
+  dates2=[None]*len(rdvpre)
+  x=1
+  y=0
+  année=[None]
+  mois=[None]
+  while i < len(rdvpre):
+    dates[i]=rdvpre[i][0]
+    dates2[i]=datetime(rdvpre[i][0].year,rdvpre[i][0].month,1)
+
+    i+=1
+  année[0]=dates2[0]
+  x = np.array(dates2)
+  année = np.unique(x)
+  
+  varrdv=StringVar(root)
+  varrdv.set(année[0])
+  
+  OptionRDV = OptionMenu(root,varrdv,*année)
+  tkcalendar = TkinterCalendar()
+  today=date.today()
+  currentyear = int(today.strftime("%Y"))
+  currentmonth =int(today.strftime("%m"))
+
+
+  for year, month in [(currentyear,currentmonth)]:
+      Label(root, text = '{} / {}'.format(year, month)).pack()
+
+      frame = tkcalendar.formatmonth(root, year, month)
+      frame.pack()
+  rdvexistant=Label(root,text="Selectionner une année parmis les rdv existants")
+  OptionRDV.pack()
+  afficher=Button(root,text="Afficher",command=lambda : afficherdatechoisi(varrdv.get(),root))
+  afficher.pack()
+  return root
+
+def afficherdatechoisi(date,rootr):
+
+  rootr.destroy()
+  print(date)
+  date =datetime.strptime(date,'%Y-%m-%d %H:%M:%S')
+  extractyear=date.year
+  extractmonth=date.month
+  root = Tk()
+  center(root)
+  rdvpre=gettable("vue_psy")
+  dates=[None]*len(rdvpre)
+  dates2=[None]*len(rdvpre)
+  x=1
+  i=0
+  y=0
+  année=[None]
+  mois=[None]
+  while i < len(rdvpre):
+    dates[i]=rdvpre[i][0]
+    dates2[i]=datetime(rdvpre[i][0].year,rdvpre[i][0].month,1)
+
+    i+=1
+  année[0]=dates2[0]
+  x = np.array(dates2)
+  année = np.unique(x)
+  
+  varrdv=StringVar(root)
+  varrdv.set(année[0])
+  
+  OptionRDV = OptionMenu(root,varrdv,*année)
+  tkcalendar = TkinterCalendar()
+  today=date.today()
+  currentyear = int(today.strftime("%Y"))
+  currentmonth =int(today.strftime("%m"))
+  
+  Label(root, text = '{} / {}'.format(extractyear, extractmonth)).pack()
+
+  frame = tkcalendar.formatmonth(root, extractyear, extractmonth)
+  frame.pack()
+  rdvexistant=Label(root,text="Selectionner une année parmis les rdv existants")
+  OptionRDV.pack()
+  afficher=Button(root,text="Afficher",command=lambda : afficherdatechoisi(varrdv.get(),root))
+  afficher.pack()
+  return root
 
 
 
@@ -115,7 +294,7 @@ def deuxieme(root3):
   lab1 = Label(root2, text="----------------connexion établie-----------------")
   lab2 =Label(root2, text="Que voulez-vous faire ?")
   button1 =Button(root2, text="Organiser un rdv",command = lambda : inputrdv(root2))
-  calendrier = Button(root2,text="Consulter les rendez-vous")
+  calendrier = Button(root2,text="Consulter les rendez-vous",command=lambda: consulterrdv(root2))
   button2 =Button(root2, text="Informations Clients", command = lambda: infoclients(root2))
   inscrip= Button(root2,text='Inscription de clients ',command = lambda : inscription(root2))
   button3=Button(root2, text="Déconnexion", command = lambda : premiere(root2))
@@ -180,7 +359,7 @@ class option():  ###Cette classe nous permet de créer les option pour L'option 
     
   
 
-  
+
 
   
 def selectname(id,name,name2,group,table):
@@ -422,7 +601,7 @@ def checkvalid(clientid,clientid2,clientid3,année,jour,mois,heure):
     mycursor = mydb.cursor()
     sql = "INSERT INTO consultation (id_consult, date, heuredebut, heurefin, prix, mode, anxiete, commentaires) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
 
-    val = ("NULL", str(année)+"-"+str(mois)+"-"+str(jour) , heure , heureadd ,100,""," "," ")
+    val = (None, str(année)+"-"+str(mois)+"-"+str(jour) , heure , heureadd ,100,""," "," ")
     mycursor.execute(sql,val)
     mydb.commit()
     id_consult=sortdv()
