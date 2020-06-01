@@ -126,7 +126,7 @@ def premiereclient(root2):
     deco(root2)
   root = Tk()
   center(root)
-  root.title("Connexion page")
+  root.title("Connexion page client")
   lab1 = Label(root,text="Bienvenue, veuilliez vous connecter")
   lab2 = Label(root,text="Identifiant : ")
   lab3=Label(root,text="Mot de passe")
@@ -215,12 +215,13 @@ class TkinterCalendar(calendar.Calendar):
 ##def onclick():
 
 
-def consulterrdv(root2):
+def consulterrdv(root2): ###
   root2.destroy()
   i=0
   j=1
   k=2
   root = Tk()
+  root.title("Rendez-vous planifiés")
   center(root)
   
   rdvpre=gettable("vue_psy")
@@ -471,12 +472,6 @@ def sortdv (): ###On va ranger dans un tableau l'ordre des consultation
   myresult = mycursor.fetchall()
   dernier=myresult[-1][0]
   
-  # mysecond=[None]*(len(myresult)-1)
-  # p=0
-
-  # while p <len(myresult):
-  #   mysecond[p]=int(myresult[p][0])
-  #   p+1
     
   return dernier
 
