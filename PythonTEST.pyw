@@ -1,6 +1,7 @@
 import mysql.connector
 from tkinter import *
 from datetime import *
+import re
 
 """
 mydb = mysql.connector.connect(
@@ -85,7 +86,7 @@ def premiere (root2):
   lab2 = Label(root,text="Identifiant : ")
   lab3=Label(root,text="Mot de passe")
   entryname= Entry(root)
-  entrypass= Entry(root)
+  entrypass= Entry(root,show='*')
 
   lab1.grid(column=0, row=0)
   lab2.grid(column=0, row=1)
@@ -280,8 +281,10 @@ def inscrire(nom,prenom,email,password,passwordmatch,couple,age,hf,connu):
     root=Tk()
     center(root)
     root.title("Le mot de passe ne correspond pas")
-    Label=label(root,text="Attention le mot de passe ne correspond pas")
+    label=Label(root,text="Attention le mot de passe ne correspond pas")
     Recommencer = Button(root,text="Ok",command=lambda : root.destroy())
+    label.pack()
+    Recommencer.pack()
 
   
 
@@ -361,7 +364,7 @@ def inputrdv(root):
   retour=Button(root4,text="Retour",command=lambda : deuxieme(root4))
   retour.pack(side="bottom")
 
-  Valider= Button(root4,text="Valider/Vérifier", command= lambda : checkvalid(varclients.get(),variableyear.get(),variableday.get(),variablemonth.get(),variablehour.get()))
+  Valider= Button(root4,text="Valider/Vérifier", command= lambda : checkvalid(varclients.get(),varclients2.get(),varclients3.get(),variableyear.get(),variableday.get(),variablemonth.get(),variablehour.get()))
   Valider.pack(padx=5,pady=9,side=BOTTOM)
 
   return root4
@@ -370,8 +373,15 @@ def inputrdv(root):
  
 
   
-def checkvalid(clientid,année,jour,mois,heure):
+def checkvalid(clientid,clientid2,clientid3,année,jour,mois,heure):
+
   client=clientid[1]
+  if clientid2!="None":
+    
+    client2=re.sub("[^0-9]","",clientid2)
+    
+  if clientid3!="None":
+    client3=re.sub("[^0-9]","",clientid3)
   heure = heure.split("h")
   heureadd = heure
   if heure[1] != '':
@@ -411,12 +421,23 @@ def checkvalid(clientid,année,jour,mois,heure):
     mycursor.execute(sql,val)
     mydb.commit()
     id_consult=sortdv()
- 
-    
+
     sql2="INSERT INTO consult_patient (id_user, id_consult) VALUES (%s,%s)"
     val2 = (str(client),str(id_consult))
     mycursor.execute(sql2,val2)
     mydb.commit()
+    if clientid2 !="None":
+      sql3="INSERT INTO consult_patient (id_user, id_consult) VALUES (%s,%s)"
+      val3 = (str(client2),str(id_consult))
+      mycursor.execute(sql3,val3)
+      mydb.commit()
+    if clientid3 !="None":
+      sql4="INSERT INTO consult_patient (id_user, id_consult) VALUES (%s,%s)"
+      val4 = (str(client3),str(id_consult))
+      mycursor.execute(sql4,val4)
+      mydb.commit()
+
+      
 
     ##mycursor.execute("INSERT INTO `psychologue`.`consultation` (`id_consult`, `date`, `heuredebut`, `heurefin`, `prix`, `mode`, `anxiete`, `commentaires`) VALUES (NULL," +str(année)+"-"+str(mois)+"-"+str(jour)+" , " + str(heure)+ " , " +str(heureadd)+ " , " +"''"+","+"''" +","+ "' '" +","+"' ' );")
     print("Insert is successful")          
@@ -437,10 +458,10 @@ def infoclients(root2):
 
 
 
-  textId=Text(root3,width=20)
-  textPrenom=Text(root3,width=20)
-  textNom=Text(root3,width=20)
-  textMail=Text(root3,width=20)
+  textId=Text(root3,width=20,height=15)
+  textPrenom=Text(root3,width=20,height=15)
+  textNom=Text(root3,width=20,height=15)
+  textMail=Text(root3,width=20,height=15)
   liste=printable("user")
 
   Retour=Button(root3,text="Retour",command= lambda: deuxieme(root3))
@@ -497,52 +518,6 @@ def menu():
   root = premiere()
   
   root.mainloop()
-
-  """
-  print("Connectez-vous")
-  identifiant = input("\n Indentifiant : ")
-  mdp = input("\n Mot de passe : ")
-  connection(identifiant,mdp)
-  
-  if mydb != None:
-    print("connection établie")
-
-  print("------------------------------Bienvenu sur Psynote------------------------------ \t")
-  print("Que voulez-vous faire ?")
-  print("1.Prendre un rdv")
-  print("2.Voir les rendez-vous")
-  print("3.Informations Clients") 
-  print("4.Déconnexion")
-  
-  
-  while 1:
-    choix = input("\n Choix : ")
-    if choix =='1':
-      fenetre("Hello man")  
-      
-    if choix == '3':
-      while 1:
-        
-        print("1.Montrer client")
-        print("2.Montrer adresse")
-        print("3.Quittez")
-        choix2 =input("\n Choix 2 : ")
-        if choix2 =='1':
-          printable("patient")
-        if choix2 == '2':
-
-          printable("adresse")
-        if choix2 == '3':
-          break
-
-        
-
-
-
-    if choix == '4':
-      print("Au revoir")
-      break
-    """
 
 if __name__ == "__main__":
   root = premiere(None)
