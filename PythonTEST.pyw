@@ -424,7 +424,7 @@ def afficherdatechoisibis(date,rootr,id):
   return root
 
 
-def deuxiemebis(root3,id):
+def deuxiemebis(root3,id): #### on rajoute ID pour pouvoir reconnaitre le client a la connexion
   print(id)
   deco(root3)
   root2 = Tk()
@@ -441,7 +441,7 @@ def deuxiemebis(root3,id):
   return root2
 
 
-
+####menu pour le psy
 def deuxieme(root3):
   
   deco(root3)
@@ -464,6 +464,7 @@ def deuxieme(root3):
   button3.grid(column=0,row=6)
   return root2
 
+######Nous donne les option pour les menu OptionMenu dans le code
 class option():  ###Cette classe nous permet de créer les option pour L'option menu et ainsi de pouvoir input les rdv
   OPTIONannée=[None]*4
   OPTIONmois=[None]*12
@@ -765,7 +766,7 @@ def checkvalid(clientid,clientid2,clientid3,année,jour,mois,heure):
     mydb.commit()
     id_consult=sortdv()
 
-    sql2="INSERT INTO consult_patient (id_user, id_consult) VALUES (%s,%s)"
+    sql2="INSERT INTO consult_patient (id_user, id_consult) VALUES (%s,%s)" ####On insert dans consult_patient les id qui nous importent
     val2 = (str(client),str(id_consult))
     mycursor.execute(sql2,val2)
     mydb.commit()
